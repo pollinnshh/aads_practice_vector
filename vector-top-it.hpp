@@ -15,12 +15,15 @@ struct Vector
   Vector< T >& operator=(const Vector< T >& ) = delete;
   
   size_t getSize() const noexcept;
+  size_t getCapacity() const noexcept;
   bool isEmpty() const noexcept;
   
   T& operator[](size_t id) noexcept;
   const T& operator[](size_t id) const noexcept;
   T& at(size_t id);
   const T& at(size_t id) const;
+  
+  void pushBack(const T& value);
   
 private:
   T* data_;
@@ -30,6 +33,9 @@ private:
 
 template < class T >
 bool operator==(const Vector<T>& lhs, const Vector<T>& rhs);
+
+template < class T >
+bool operator!=(const Vector<T>& lhs, const Vector<T>& rhs);
 }
 
 template< class T >
@@ -108,4 +114,56 @@ size_t topit::Vector< T >::getSize() const noexcept {
   return size_;
 }
 
+template< class T >
+size_t topit::Vector< T >::getCapacity() const noexcept {
+  return capacity_;
+}
+
+template< class T >
+T& topit::Vector< T >::operator[](size_t id) noexcept {
+  return data_[id];
+}
+
+template< class T >
+const T& topit::Vector< T >::operator[](size_t id) const noexcept {
+  return data_[id];
+}
+
+template< class T >
+void topit::Vector< T >::pushBack(const T& value) {
+  if (size_ == capacity_) {
+    size_t new_capacity = (capacity_ == 0) ? 1 : capacity_ * 2;
+    
+    T* new_data = new T[new_capacity];
+    
+    for (size_t i = 0; i < size_; ++i) {
+      new_data[i] = data_[i];
+    }
+    
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_capacity;
+  }
+  
+  data_[size_] = value;
+  ++size_;
+}
+
+template < class T >
+bool topit::operator==(const Vector<T>& lhs, const Vector<T>& rhs) {
+  if (lhs.getSize() != rhs.getSize()) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs.getSize(); ++i) {
+    if (lhs[i] != rhs[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template < class T >
+bool topit::operator!=(const Vector<T>& lhs, const Vector<T>& rhs) {
+  return !(lhs == rhs);
+}
 #endif

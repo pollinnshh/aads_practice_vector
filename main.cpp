@@ -85,7 +85,7 @@ int main() {
   
   for (size_t i = 0; i < count; ++i) {
     // std::cout << tests[i].first << " : " << tests[i].second << '\n';
-    bool case_result = tests[i].first;
+    bool case_result = tests[i].first();
     result = result && case_result;
     std::cout << case_result;
     std::cout << ": ";
