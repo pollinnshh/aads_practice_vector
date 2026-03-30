@@ -11,9 +11,12 @@ struct Vector
   ~Vector();
   
   
-  Vector(const Vector< T >&) = delete;
-  Vector< T >& operator=(const Vector< T >& ) = delete;
+  Vector(const Vector< T >&);
+  Vector< T >& operator=(const Vector< T >& );
+  Vector(Vector< T >&&) noexcept;
+  Vector< T >& operator=(Vector< T >&&) noexcept; //конструктор перемещения
   
+  void swap(Vector< T >&) noexcept;
   size_t getSize() const noexcept;
   size_t getCapacity() const noexcept;
   bool isEmpty() const noexcept;
@@ -36,6 +39,49 @@ bool operator==(const Vector<T>& lhs, const Vector<T>& rhs);
 
 template < class T >
 bool operator!=(const Vector<T>& lhs, const Vector<T>& rhs);
+}
+
+template< class T >
+topit::Vector< T >::Vector(const Vector< T >& rhs):
+  Vector(rhs.getSize())
+{
+    for (size_t i = 0; i < getSize(); ++i) {
+      data_[i] = rhs.data_[i];
+    }
+  }
+
+//template< class T >
+//topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
+//{
+//  T* d = new T[rhs.getSize()];
+//  try {
+//    for (size_t i = 0; i < rhs.getSize(); ++i) {
+//      d[i] = rhs.data_[i];
+//    }
+//  } catch (...) {
+//    delete [] d;
+//    throw;
+//  }
+//  delete [] data_;
+//  data_ = d;
+//  size_ = rhs.getSize();
+//  capacity_ = rhs.getSize();
+//  return *this;
+//}
+
+template< class T >
+topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
+{
+  Vector< T > cpy(rhs);
+  std::swap(data_, cpy.data_);
+  swap(cpy);
+  return *this;
+}
+
+template< class T >
+void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
+{
+  
 }
 
 template< class T >

@@ -65,6 +65,18 @@ bool test7() {
   }
 }
 
+bool test8() {
+  Vector< int > yav(2, 0);
+  Vector< int > yav = v;
+  return yav == v;
+}
+
+bool test9() {
+  Vector< int > v;
+  Vector< int > yav(2, 0);
+  bool res
+}
+
 int main() {
   using test_f = bool(*)();
   using case_t = std::pair< test_f, const char* >;
