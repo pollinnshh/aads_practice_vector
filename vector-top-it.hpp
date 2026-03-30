@@ -42,6 +42,18 @@ bool operator!=(const Vector<T>& lhs, const Vector<T>& rhs);
 }
 
 template< class T >
+topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
+data_(rhs.data_);
+size_(rhs.size_);
+capacity_(rhs.capacity_);
+{
+  rhs.data_ = nullptr;
+}
+
+template< class T >
+topit::Vector< T >& topit::Vector< T >&& rhs noexcept:
+
+template< class T >
 topit::Vector< T >::Vector(const Vector< T >& rhs):
   Vector(rhs.getSize())
 {
@@ -73,7 +85,6 @@ template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
 {
   Vector< T > cpy(rhs);
-  std::swap(data_, cpy.data_);
   swap(cpy);
   return *this;
 }
@@ -81,7 +92,9 @@ topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
 template< class T >
 void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
-  
+  std::swap(data_, rhs.data_);
+  std::swap(size_, rhs.size_);
+  std::swap(capacity_, rhs.capacity_);
 }
 
 template< class T >

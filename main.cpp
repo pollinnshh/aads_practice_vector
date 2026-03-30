@@ -74,7 +74,40 @@ bool test8() {
 bool test9() {
   Vector< int > v;
   Vector< int > yav(2, 0);
-  bool res
+  bool res = v != yav;
+  v = yav;
+  return res && yav == v;
+}
+
+bool test10()
+{
+  Vector< int > v(2, 0);
+  Vector< int > yav(3, 1);
+  
+  Vector< int > cpy_v(v);
+  Vector< int > cpy_yav(yav);
+  
+  v.swap(yav);
+  return cpy_v == yav && cpy_yav == v;
+}
+
+bool test11()
+{
+  Vector< int > v(2, 0);
+  Vector< int > cpy_v(v);
+  
+  Vector< int > yav = std::move(v);
+  return yav == cpy_v;
+}
+
+bool test12()
+{
+  Vector< int > v(2, 0);
+  Vector< int > yav;
+  Vector< int > cpy(v);
+  
+  yav == std::move(v);
+  return yav == cpy;
 }
 
 int main() {
@@ -87,7 +120,12 @@ int main() {
     {test4, "In range access does not generate exceptions"},
     {test5, "Out of range access generates std::out_of_range exception"},
     {test6, "In range access for const vector: same as non-const"},
-    {test7, "Out of range access for const vector: same as non-const"}
+    {test7, "Out of range access for const vector: same as non-const"},
+    {test8, "Copy constructor"},
+    {test9, "Copy assignment operator"},
+    {test10, "Swap for two vectors"}
+    {test11, "Move constructor"}
+    {test12, "Move assignment operator"}
   };
   
   size_t count = sizeof(tests) / sizeof(case_t);
