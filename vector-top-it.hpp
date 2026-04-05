@@ -27,6 +27,7 @@ struct Vector
   const T& at(size_t id) const;
   
   void pushBack(const T& value);
+  void pushFront(const T& value);
   
 private:
   T* data_;
@@ -35,10 +36,25 @@ private:
 };
 
 template < class T >
-bool operator==(const Vector<T>& lhs, const Vector<T>& rhs);
+bool operator==(const Vector<T>& lhs, const Vector<T>& rhs) {
+  return false;
+}
 
 template < class T >
-bool operator!=(const Vector<T>& lhs, const Vector<T>& rhs);
+bool operator!=(const Vector<T>& lhs, const Vector<T>& rhs) {
+  return false;
+}
+}
+
+template< class T >
+void topit::Vector< T >::pushFront(const T& value)
+{
+  Vector< T > result(getSize() + 1);
+  result[0] = value;
+  for (size_t i = 0; i < getSize(); ++i) {
+    result[i + 1] = (*this)[i];
+  }
+  swap(result);
 }
 
 template< class T >
@@ -49,9 +65,6 @@ capacity_(rhs.capacity_);
 {
   rhs.data_ = nullptr;
 }
-
-template< class T >
-topit::Vector< T >& topit::Vector< T >&& rhs noexcept:
 
 template< class T >
 topit::Vector< T >::Vector(const Vector< T >& rhs):
@@ -82,8 +95,20 @@ topit::Vector< T >::Vector(const Vector< T >& rhs):
 //}
 
 template< class T >
+topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs) noexcept
+{
+  Vector< T > cpy(std::move(rhs));
+  swap(cpy);
+  return *this;
+}
+
+template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
 {
+  if (this == std::addressof(rhs))
+  {
+    return *this;
+  }
   Vector< T > cpy(rhs);
   swap(cpy);
   return *this;
@@ -121,6 +146,15 @@ const T& topit::Vector< T >::at(size_t id) const {
 }
 
 template< class T >
+topit::Vector< T >::Vector(size_t size, const T& val) :
+Vector(size)
+{
+  for (size_t i = 0; i < size; ++i) {
+    data_[i] = val;
+  }
+}
+
+template< class T >
 topit::Vector< T >::Vector() : data_(nullptr), size_(0), capacity_(0)
 {}
 
@@ -152,16 +186,6 @@ capacity_(size)
 //   }
 // }
 // template< class T >
-
-template< class T >
-topit::Vector< T >::Vector(size_t size, const T& val) :
-Vector(size)
-{
-  for (size_t i = 0; i < size; ++i) {
-    data_[i] = val;
-  }
-}
-
 
 template< class T >
 bool topit::Vector< T >::isEmpty() const noexcept {
@@ -224,5 +248,17 @@ bool topit::operator==(const Vector<T>& lhs, const Vector<T>& rhs) {
 template < class T >
 bool topit::operator!=(const Vector<T>& lhs, const Vector<T>& rhs) {
   return !(lhs == rhs);
+}
+
+template< class T >
+topit::Vector< T >::Vector():
+data_(nullptr),
+size_(0),
+capacity_(0)
+{}
+template< class T >
+topit::Vector< T >::~Vector()
+{
+  delete [] data_;
 }
 #endif
