@@ -21,14 +21,48 @@ struct Vector
   size_t getSize() const noexcept;
   size_t getCapacity() const noexcept;
   bool isEmpty() const noexcept;
-  
+
   T& operator[](size_t id) noexcept;
   const T& operator[](size_t id) const noexcept;
   T& at(size_t id);
   const T& at(size_t id) const;
-  
+
   void pushBack(const T& value);
   void pushFront(const T& value);
+
+  void insert(size_t pos, const T& val);
+  void insert(size_t pos, const Vector<T>& rhs, size_t b, size_t e);
+  void erase(size_t pos);
+  
+  struct Iterator {
+    T* ptr;
+    Iterator() : ptr(nullptr) {}
+    explicit Iterator(T* p) : ptr(p) {}
+    
+    T& operator*() { return *ptr; }
+    const T& operator*() const { return *ptr; }
+    
+    Iterator& operator++() { ++ptr; return *this; }
+    Iterator operator++(int) {
+      Iterator tmp = *this;
+      ++ptr;
+      return tmp;
+    }
+    
+    bool operator==(const Iterator& other) const { return ptr == other.ptr; }
+    bool operator!=(const Iterator& other) const { return ptr != other.ptr; }
+  };
+
+  void insert(Iterator pos, const T& val);
+  void erase(Iterator pos);
+  
+  template<class IT>
+  void insert(Iterator pos, IT begin, IT end);
+  
+  Iterator begin() { return Iterator(data_); }
+  Iterator end() { return Iterator(data_ + size_); }
+
+
   
 private:
   T* data_;
@@ -36,6 +70,7 @@ private:
   size_t capacity_;
   
   explicit Vector(size_t s);
+  void reserve(size_t new_cap);
 };
 
 template < class T >
@@ -244,6 +279,112 @@ bool topit::operator==(const Vector<T>& lhs, const Vector<T>& rhs) {
 template < class T >
 bool topit::operator!=(const Vector<T>& lhs, const Vector<T>& rhs) {
   return !(lhs == rhs);
+}
+
+##############
+template<class T>
+void Vector<T>::reserve(size_t new_cap) {
+  if (new_cap <= capacity_) return;
+  
+  T* new_data = new T[new_cap];
+  for (size_t i = 0; i < size_; ++i) {
+    new_data[i] = std::move(data_[i]);
+  }
+  delete[] data_;
+  data_ = new_data;
+  capacity_ = new_cap;
+}
+
+template<class T>
+void Vector<T>::insert(size_t pos, const T& val) {
+  if (pos > size_) {
+    throw std::out_of_range("insert: pos > size");
+  }
+  
+  if (size_ == capacity_) {
+    size_t new_cap = (capacity_ == 0) ? 1 : capacity_ * 2;
+    reserve(new_cap);
+  }
+  
+  for (size_t i = size_; i > pos; --i) {
+    data_[i] = std::move(data_[i - 1]);
+  }
+  data_[pos] = val;
+  ++size_;
+}
+
+template<class T>
+void Vector<T>::insert(size_t pos, const Vector<T>& rhs, size_t b, size_t e) {
+  if (pos > size_) {
+    throw std::out_of_range("insert: pos > size");
+  }
+  if (b > e || e > rhs.size_) {
+    throw std::out_of_range("insert: invalid range");
+  }
+  
+  size_t count = e - b;
+  if (count == 0) return;
+  
+  if (size_ + count > capacity_) {
+    reserve(size_ + count);
+  }
+  
+  for (size_t i = size_; i > pos; --i) {
+    data_[i + count - 1] = std::move(data_[i - 1]);
+  }
+  for (size_t i = 0; i < count; ++i) {
+    data_[pos + i] = rhs.data_[b + i];
+  }
+  size_ += count;
+}
+
+template<class T>
+void Vector<T>::erase(size_t pos) {
+  if (pos >= size_) {
+    throw std::out_of_range("erase: pos >= size");
+  }
+  
+  for (size_t i = pos; i < size_ - 1; ++i) {
+    data_[i] = std::move(data_[i + 1]);
+  }
+  --size_;
+}
+
+template<class T>
+void Vector<T>::insert(Iterator pos, const T& val) {
+  insert(pos.ptr - data_, val);
+}
+
+template<class T>
+void Vector<T>::erase(Iterator pos) {
+  erase(pos.ptr - data_);
+}
+
+template<class T>
+template<class IT>
+void Vector<T>::insert(Iterator pos, IT begin, IT end) {
+  size_t index = pos.ptr - data_;
+  size_t count = 0;
+  
+  for (IT it = begin; it != end; ++it) {
+    ++count;
+  }
+  
+  if (count == 0) return;
+  
+  if (size_ + count > capacity_) {
+    reserve(size_ + count);
+  }
+  
+  for (size_t i = size_; i > index; --i) {
+    data_[i + count - 1] = std::move(data_[i - 1]);
+  }
+  
+  IT it = begin;
+  for (size_t i = 0; i < count; ++i, ++it) {
+    data_[index + i] = *it;
+  }
+  size_ += count;
 }
 
 template< class T >
