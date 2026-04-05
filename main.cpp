@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include "vector-top-it.hpp"
 
 using topit::Vector;
@@ -23,17 +24,18 @@ bool test4() {
   constexpr size_t size = 3ull;
   Vector< int > v(size, 1);
   try {
-    int value = v.at(0);
+    int& value = v.at(0);
     return value == 1;
-  } catch (...) {
+  } catch (... ) {
     return false;
   }
 }
+
 bool test5() {
   constexpr size_t size = 3ull;
   Vector< int > v(size, 0);
   try {
-    v.at(size + 10);
+    v.at(size + 1);
     return false;
   } catch (const std::out_of_range&) {
     return true;
@@ -41,22 +43,23 @@ bool test5() {
     return false;
   }
 }
+
 bool test6() {
   constexpr size_t size = 3ull;
-  Vector< int > v(size, 1);
+  const Vector< int > v(size, 1);
   try {
     const int& value = v.at(0);
     return value == 1;
-  } catch (...) {
+  } catch (... ) {
     return false;
   }
 }
 
 bool test7() {
   constexpr size_t size = 3ull;
-  Vector< int > v(size, 0);
+  const Vector< int > v(size, 0);
   try {
-    v.at(size + 10);
+    v.at(size + 1);
     return false;
   } catch (const std::out_of_range&) {
     return true;
@@ -66,7 +69,7 @@ bool test7() {
 }
 
 bool test8() {
-  Vector< int > yav(2, 0);
+  Vector< int > v(2, 0);
   Vector< int > yav = v;
   return yav == v;
 }
@@ -76,23 +79,21 @@ bool test9() {
   Vector< int > yav(2, 0);
   bool res = v != yav;
   v = yav;
-  return res && yav == v;
+  return res && v == yav;
 }
 
-bool test10()
-{
+bool test10() {
   Vector< int > v(2, 0);
   Vector< int > yav(3, 1);
   
   Vector< int > cpy_v(v);
   Vector< int > cpy_yav(yav);
-  
   v.swap(yav);
+  
   return cpy_v == yav && cpy_yav == v;
 }
 
-bool test11()
-{
+bool test11() {
   Vector< int > v(2, 0);
   Vector< int > cpy_v(v);
   
@@ -100,50 +101,49 @@ bool test11()
   return yav == cpy_v;
 }
 
-bool test12()
-{
+bool test12() {
   Vector< int > v(2, 0);
-  Vector< int > yav;
   Vector< int > cpy(v);
+  Vector< int > yav;
   
-  yav == std::move(v);
+  yav = std::move(v);
   return yav == cpy;
 }
 
 int main() {
-  using test_f = bool(*)();
-  using case_t = std::pair< test_f, const char* >;
+  using test_t = bool(*)();
+  using case_t = std::pair< test_t, const char* >;
   case_t tests[] = {
-    {test1, "Default constructed vector must be empty"},
-    {test2, "Default constructed vector size is zero"},
-    {test3, "Vector constructed with size has non-zero size"},
-    {test4, "In range access does not generate exceptions"},
-    {test5, "Out of range access generates std::out_of_range exception"},
-    {test6, "In range access for const vector: same as non-const"},
-    {test7, "Out of range access for const vector: same as non-const"},
-    {test8, "Copy constructor"},
-    {test9, "Copy assignment operator"},
-    {test10, "Swap for two vectors"}
-    {test11, "Move constructor"}
-    {test12, "Move assignment operator"}
+    { test1, "Default constructed vector is empty" },
+    { test2, "Default constructed vector size is zero" },
+    { test3, "Vector constructed with size has non-zero size" },
+    { test4, "In range access does not generate exceptions" },
+    { test5, "Out of range access generates std::out_of_range exception" },
+    { test6, "In range access for const vector: same as non-const" },
+    { test7, "Out of range access for const vector: same as non-const" },
+    { test8, "Copy constructor"},
+    { test9, "Copy assignment operator"},
+    { test10, "Swap for two vectors"},
+    { test11, "Move constructor"},
+    { test12, "Move assignment operator"}
   };
   
   size_t count = sizeof(tests) / sizeof(case_t);
+  
   std::cout << std::boolalpha;
   bool result = true;
-  size_t fails = 0, successes = 0;
-  
+  size_t successes = 0, fails = 0;
   for (size_t i = 0; i < count; ++i) {
-    // std::cout << tests[i].first << " : " << tests[i].second << '\n';
     bool case_result = tests[i].first();
+    successes += case_result;
+    fails += !case_result;
     result = result && case_result;
     std::cout << case_result;
     std::cout << ": ";
-    std::cout << tests[i].second << '\n';
+    std::cout << tests[i].second << "\n";
   }
-  
   std::cout << "SUMMARY\n";
-  std::cout << result << " : TEST RESULTS\n";
+  std::cout << result << ": TEST RESULTS\n";
   std::cout << fails << ": failed tests\n";
   std::cout << successes << ": passed tests\n";
 }
