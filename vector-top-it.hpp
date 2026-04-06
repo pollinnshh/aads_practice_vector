@@ -1,6 +1,7 @@
 #ifndef VECTOR_TOP_IT_HPP
 #define VECTOR_TOP_IT_HPP
 #include <cstddef>
+#include <initializer_list>
 
 namespace topit {
 template < class T >
@@ -16,6 +17,8 @@ struct Vector
   Vector< T >& operator=(const Vector< T >& );
   Vector(Vector< T >&&) noexcept;
   Vector< T >& operator=(Vector< T >&&) noexcept; //конструктор перемещения
+  
+  Vector(std::initializer_list< T > il);
   
   void swap(Vector< T >&) noexcept;
   size_t getSize() const noexcept;
@@ -82,6 +85,16 @@ template < class T >
 bool operator!=(const Vector<T>& lhs, const Vector<T>& rhs) {
   return false;
 }
+}
+
+template< class T >
+topit::Vector< T >::Vector(std::initializer_list< T > il):
+  Vector(il.size())
+{
+    size_t i = 0;
+    for (auto it = il.begin(); it != il.end(); ++i){
+      data[i++] = *it;
+    }
 }
 
 template< class T >

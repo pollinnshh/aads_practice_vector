@@ -139,6 +139,16 @@ bool test15() {
   return v.getSize() == 4 && v[0] == 1 && v[1] == 2 && v[2] == 4 && v[3] == 5;
 }
 
+bool test16() {
+  Vector< int > v{1, 2};
+  return (v.getSize() == 2) && (v.at(0) == 1) && (v.at(1) == 2);
+}
+
+bool test17() {
+  Vector< int > v{};
+  return v.isEmpty();
+}
+
 int main() {
   using test_t = bool(*)();
   using case_t = std::pair< test_t, const char* >;
@@ -158,6 +168,8 @@ int main() {
     { test13, "Insert in middle" },
     { test14, "Insert range from another vector" },
     { test15, "Erase from middle" },
+    { test16, "Non-empty initializer list ctr" },
+    { test17, "Empty initializer list ctr" }
   };
   
   size_t count = sizeof(tests) / sizeof(case_t);
