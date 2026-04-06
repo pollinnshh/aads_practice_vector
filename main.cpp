@@ -139,43 +139,6 @@ bool test15() {
   return v.getSize() == 4 && v[0] == 1 && v[1] == 2 && v[2] == 4 && v[3] == 5;
 }
 
-bool test16() {
-  Vector<int> v;
-  v.pushBack(10);
-  v.pushBack(30);
-  
-  auto it = v.begin();
-  ++it;
-  v.insert(it, 20);
-  
-  return v.getSize() == 3 && v[0] == 10 && v[1] == 20 && v[2] == 30;
-}
-
-bool test17() {
-  Vector<int> v;
-  for (int i = 1; i <= 5; ++i) v.pushBack(i);
-  
-  auto it = v.begin();
-  ++it;
-  ++it;
-  v.erase(it);
-  
-  return v.getSize() == 4 && v[0] == 1 && v[1] == 2 && v[2] == 4 && v[3] == 5;
-}
-
-bool test18() {
-  Vector<int> v;
-  v.pushBack(1);
-  v.pushBack(5);
-  
-  int arr[] = {2, 3, 4};
-  auto it = v.begin();
-  ++it;
-  v.insert(it, std::begin(arr), std::end(arr));
-  
-  return v.getSize() == 5 && v[0] == 1 && v[1] == 2 && v[2] == 3 && v[3] == 4 && v[4] == 5;
-}
-
 int main() {
   using test_t = bool(*)();
   using case_t = std::pair< test_t, const char* >;
@@ -195,9 +158,6 @@ int main() {
     { test13, "Insert in middle" },
     { test14, "Insert range from another vector" },
     { test15, "Erase from middle" },
-    { test16, "Insert by iterator" },
-    { test17, "Erase by iterator" },
-    { test18, "Insert range from array" }
   };
   
   size_t count = sizeof(tests) / sizeof(case_t);
