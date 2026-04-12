@@ -73,7 +73,6 @@ private:
   size_t capacity_;
   
   explicit Vector(size_t s);
-  void reserve(size_t new_cap);
 };
 
 template < class T >
@@ -296,16 +295,12 @@ bool topit::operator!=(const Vector<T>& lhs, const Vector<T>& rhs) {
 
 ##############
 template<class T>
-void Vector<T>::reserve(size_t new_cap) {
-  if (new_cap <= capacity_) return;
-  
-  T* new_data = new T[new_cap];
-  for (size_t i = 0; i < size_; ++i) {
-    new_data[i] = std::move(data_[i]);
+void Vector<T>::reserve(size_t k) {
+  Vector< T > v(k);
+  for (size_t i = 0; i < getSize(); ++i) {
+    v[i] = std::move((*this)[i]);
   }
-  delete[] data_;
-  data_ = new_data;
-  capacity_ = new_cap;
+  swap(v);
 }
 
 template<class T>
