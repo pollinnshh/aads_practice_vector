@@ -149,6 +149,89 @@ bool test17() {
   return v.isEmpty();
 }
 
+bool test18() {
+  Vector<int> v;
+  v.reserve(100);
+  return v.getCapacity() == 100 && v.getSize() == 0;
+}
+
+bool test19() {
+  Vector<int> v(10, 5);
+  v.reserve(5);
+  return v.getCapacity() == 10 && v.getSize() == 10;
+}
+
+bool test20() {
+  Vector<int> v;
+  v.reserve(100);
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.shrinkToFit();
+  return v.getCapacity() == 3 && v.getSize() == 3;
+}
+
+bool test21() {
+  Vector<int> v;
+  v.reserve(100);
+  v.shrinkToFit();
+  return v.getCapacity() == 0 && v.getSize() == 0;
+}
+
+bool test22() {
+  Vector<int> v;
+  v.repeatPushBack(7, 5);
+  if (v.getSize() != 5) return false;
+  for (size_t i = 0; i < 5; ++i) {
+    if (v[i] != 7) return false;
+  }
+  return true;
+}
+
+bool test23() {
+  Vector<int> v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.repeatPushBack(9, 3);
+  return v.getSize() == 5 && v[0] == 1 && v[1] == 2 && v[2] == 9 && v[3] == 9 && v[4] == 9;
+}
+
+bool test24() {
+  Vector<int> v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.repeatInsert(1, 99, 3);
+  return v.getSize() == 6 && v[0] == 1 && v[1] == 99 && v[2] == 99 && v[3] == 99 && v[4] == 2 && v[5] == 3;
+}
+
+bool test25() {
+  Vector<int> v;
+  v.pushBack(10);
+  v.pushBack(20);
+  v.repeatInsert(2, 30, 2);
+  return v.getSize() == 4 && v[0] == 10 && v[1] == 20 && v[2] == 30 && v[3] == 30;
+}
+
+bool test26() {
+  int arr[] = {1, 2, 3, 4, 5};
+  Vector<int> v;
+  v.rangedPushBack(arr, 3);
+  return v.getSize() == 3 && v[0] == 1 && v[1] == 2 && v[2] == 3;
+}
+
+bool test27() {
+  Vector<int> src;
+  src.pushBack(10);
+  src.pushBack(20);
+  src.pushBack(30);
+  src.pushBack(40);
+  
+  Vector<int> dst;
+  dst.rangedPushBack(src.begin() + 1, 2);
+  return dst.getSize() == 2 && dst[0] == 20 && dst[1] == 30;
+}
+
 int main() {
   using test_t = bool(*)();
   using case_t = std::pair< test_t, const char* >;
@@ -170,6 +253,16 @@ int main() {
     { test15, "Erase from middle" },
     { test16, "Non-empty initializer list ctr" },
     { test17, "Empty initializer list ctr" }
+    { test18, "Increases capacity" },
+    { test19, "Does nothing if k <= capacity" },
+    { test20, "Reduces capacity to size" },
+    { test21, "shrinkToFit (on empty vector)" },
+    { test22, "Adds k copies" },
+    { test23, "After existing elements" },
+    { test24, "Inserts k copies in middle" },
+    { test25, "Inserts k copies at end" },
+    { test26, "rangedPushBack - from array" },
+    { test27, "rangedPushBack - from vector iterator" }
   };
   
   size_t count = sizeof(tests) / sizeof(case_t);

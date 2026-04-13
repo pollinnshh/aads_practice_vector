@@ -37,6 +37,14 @@ struct Vector
   void insert(size_t pos, const Vector<T>& rhs, size_t b, size_t e);
   void erase(size_t pos);
   
+  // Классная работа 2
+  void reserve(size_t k);
+  void shrinkToFit();
+  void repeatPushBack(const T& val, size_t k);
+  void repeatInsert(size_t id, const T& val, size_t k);
+  template< class IT >
+  void rangedPushBack(IT beg, size_t k);
+  
   struct Iterator {
     T* ptr;
     Iterator() : ptr(nullptr) {}
@@ -393,6 +401,51 @@ void Vector<T>::insert(Iterator pos, IT begin, IT end) {
     data_[index + i] = *it;
   }
   size_ += count;
+}
+
+template<class T>
+void topit::Vector<T>::shrinkToFit() {
+  if (size_ == capacity_) return;
+  
+  if (size_ == 0) {
+    delete[] data_;
+    data_ = nullptr;
+    capacity_ = 0;
+    return;
+  }
+  
+  T* new_data = new T[size_];
+  for (size_t i = 0; i < size_; ++i) {
+    new_data[i] = std::move(data_[i]);
+  }
+  delete[] data_;
+  data_ = new_data;
+  capacity_ = size_;
+}
+
+template<class T>
+void topit::Vector<T>::repeatPushBack(const T& val, size_t k) {
+  for (size_t i = 0; i < k; ++i) {
+    pushBack(val);
+  }
+}
+
+template<class T>
+void topit::Vector<T>::repeatInsert(size_t id, const T& val, size_t k) {
+  if (id > size_) {
+    throw std::out_of_range("repeatInsert: id > size");
+  }
+  for (size_t i = 0; i < k; ++i) {
+    insert(id + i, val);
+  }
+}
+
+template<class T>
+template<class IT>
+void topit::Vector<T>::rangedPushBack(IT beg, size_t k) {
+  for (size_t i = 0; i < k; ++i) {
+    pushBack(*(beg + i));
+  }
 }
 
 template< class T >
